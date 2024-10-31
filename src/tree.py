@@ -70,6 +70,23 @@ class Tree:
         )
         return best_child
 
+    def _ucb_select_heuristic(self, node, c=1.4):
+        """Select a child of this node using the UCB1 formula with center control heuristic."""
+
+        def center_control_heuristic(move):
+            """Heuristic to evaluate center control."""
+            center_columns = [3, 4]  # Center columns in a 0-indexed board
+            return 1 if move in center_columns else 0  # Higher score for center moves
+
+        # Select the best child using UCB1 formula adjusted by the center control heuristic
+        best_child = max(
+            node.children,
+            key=lambda child: (child.wins / child.visits if child.visits > 0 else 0) +
+                              c * math.sqrt(math.log(node.visits) / child.visits) +
+                              center_control_heuristic(child.move)  # Add heuristic score
+        )
+        return best_child
+
     def best_move_uct(self):
         """Return the child with the highest win rate (best explored move)."""
         # Guard against division by zero for win rate calculation
