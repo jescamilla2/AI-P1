@@ -1,7 +1,4 @@
 
-
-
-
 class ConnectFour:
     def __init__(self):
         # Initialize a 6x7 board with 'O' representing empty slots
@@ -10,32 +7,74 @@ class ConnectFour:
         self.players = {'R': 'Red', 'Y': 'Yellow'}
         # Track the current player
         self.current_player = 'R'
+        # keep track of valid moves left
+        self.valid_moves = [col for col in range(7)]
         # Track the game status
         self.game_over = False
+        # Status of game
+        self.winner = None
+        # if it's a draw
+        self.draw = False
+
+    def load_board(self, board_array, player):
+        """Loads a specified 2D array into the board."""
+        self.current_player = player
+
+        if len(board_array) == 6 and all(len(row) == 7 for row in board_array):
+            self.board = board_array
+        else:
+            raise ValueError("Invalid board size. Expected a 6x7 board.")
+
+        self.update_valid_moves()
+        self.update_game_status()
 
     def display_board(self):
         """Prints the current state of the board."""
         for row in self.board:
             print(' '.join(row))  # Join each row's elements with spaces for better readability
-        print("1 2 3 4 5 6 7")  # Column numbers for user reference
+        print("0 1 2 3 4 5 6")  # Column numbers for user reference
 
     def is_valid_move(self, col):
         """Checks if the column is valid for a move."""
         return self.board[0][col] == 'O'  # Valid if the top row of the column is empty
 
-    def make_move(self, col, piece):
-        """Places a piece in the specified column."""
-        for row in reversed(self.board):  # Start from the bottom row to find the lowest available slot
-            if row[col] == 'O':  # If the slot is empty
-                row[col] = piece  # Place the player's piece
-                break
+    def update_valid_moves(self):
+        """Updates the list of valid moves based on the current board state."""
+        self.valid_moves = [col for col in range(7) if self.is_valid_move(col)]
+
+    def update_game_status(self):
+        # Check for a winner or a draw and update game status
+        if self.check_winner(self.current_player):
+            self.game_over = True
+            self.winner = self.current_player
+            return {'game_over': True, 'winner': self.winner, 'message': 'Player wins!'}
+        elif self.is_draw():
+            self.game_over = True
+            self.draw = True
+            return {'game_over': True, 'winner': None, 'message': 'It\'s a draw!'}
+        else:
+            self.update_valid_moves()  # Update valid moves after making the move
+            self.switch_player()  # Switch to the next player
+            return {'game_over': False, 'winner': None, 'message': 'Game continues'}
+
+    def make_move(self, col):
+        """Places the current player's piece in the specified column and updates the board."""
+        if self.is_valid_move(col):
+            for row in reversed(self.board):  # Start from the bottom row to find the lowest available slot
+                if row[col] == 'O':  # If the slot is empty
+                    row[col] = self.current_player  # Place the player's piece
+                    break
+
+            self.update_game_status()
+
+        return False
 
     def check_winner(self, piece):
         """Checks for a win condition for the specified piece."""
         # Check horizontal, vertical, and diagonal for four-in-a-row
-        return (self.check_horizontal(piece) or
-                self.check_vertical(piece) or
-                self.check_diagonal(piece))
+        return (self._check_horizontal(piece) or
+                self._check_vertical(piece) or
+                self._check_diagonal(piece))
 
     def _check_horizontal(self, piece):
         """Checks horizontal win condition."""
@@ -95,26 +134,11 @@ class ConnectFour:
         """Switches the current player."""
         self.current_player = 'Y' if self.current_player == 'R' else 'R'
 
-    def play(self):
-        """Main game loop for playing the game."""
-        while not self.game_over:
-            self.display_board()
-            col = int(input(f"Player {self.players[self.current_player]}, choose a column (1-7): ")) - 1
+    def is_draw(self):
+        # If no empty slots remain and no winner, it's a draw
+        return all(cell != 'O' for row in self.board for cell in row)
 
-            if col < 0 or col > 6:
-                print("Invalid column! Please choose a column between 1 and 7.")
-                continue
 
-            if self.is_valid_move(col):
-                self.make_move(col, self.current_player)  # Make the move for the current player
-                if self.check_winner(self.current_player):  # Check if this move won the game
-                    self.display_board()
-                    print(f"Player {self.players[self.current_player]} wins!")
-                    self.game_over = True  # End the game if there's a winner
-                else:
-                    self.switch_player()  # Switch to the next player
-            else:
-                print("Column is full! Please choose another column.")
 
 
 
