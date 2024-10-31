@@ -1,3 +1,5 @@
+import random
+
 
 class ConnectFour:
     def __init__(self):
@@ -5,7 +7,7 @@ class ConnectFour:
         self.board = [['O'] * 7 for _ in range(6)]
         # Dictionary to map player symbols to their respective colors
         self.players = {'R': 'Red', 'Y': 'Yellow'}
-        # Track the current player
+        # set the starting player to R
         self.current_player = 'R'
         # keep track of valid moves left
         self.valid_moves = [col for col in range(7)]
@@ -54,7 +56,6 @@ class ConnectFour:
             return {'game_over': True, 'winner': None, 'message': 'It\'s a draw!'}
         else:
             self.update_valid_moves()  # Update valid moves after making the move
-            self.switch_player()  # Switch to the next player
             return {'game_over': False, 'winner': None, 'message': 'Game continues'}
 
     def make_move(self, col):
@@ -65,9 +66,16 @@ class ConnectFour:
                     row[col] = self.current_player  # Place the player's piece
                     break
 
-            self.update_game_status()
+            # Check if this move leads to a win or draw
+            game_status = self.update_game_status()
 
-        return False
+            # Switch player if the game is not over
+            if not self.game_over:
+                self.switch_player()
+            return game_status
+        else:
+            print(f"Invalid move in column {col}.")
+            return None  # Indicate that the move was invalid
 
     def check_winner(self, piece):
         """Checks for a win condition for the specified piece."""

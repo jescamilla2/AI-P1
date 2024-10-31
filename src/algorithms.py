@@ -9,8 +9,7 @@ def uniform_random_move(game, print_out=False):
     """Baseline algorithm that randomly selects from available moves."""
     num_cols = len(game.board[0])  # Get the number of columns from the board
     legal_moves = [col for col in range(num_cols) if game.is_valid_move(col)]
-
-    move = random.choice(legal_moves) if legal_moves else None
+    move = random.choice(legal_moves)
 
     if (print_out):
         print(f'FINAL Move selected: {move}')

@@ -21,21 +21,20 @@ def best_move(game, algorithm=None, simulations=0, print_out='None'):
     if algorithm == 'UR':
         # perform uniform random move
         if(print_out=='Verbose' or print_out=='Brief'):
-            uniform_random_move(game, print_out=True)
+            move = uniform_random_move(game, print_out=True)
         else:
-            uniform_random_move(game)
+            move = uniform_random_move(game)
     elif algorithm == 'PMCGS':
         # perform a moved based on Pure Monte Carlo Game Search
-        pmcgs_move(game, simulations, print_out)
+        move = pmcgs_move(game, simulations, print_out)
 
-        pass
     elif algorithm == 'UCT':
         # perform a move based Upper Confidence bound for Trees
-        uct_move(game, simulations, print_out)
+        move = uct_move(game, simulations, print_out)
     else:
         print('No algorithm selected. Please select.')
 
-
+    return move
 
 def main():
     '''
@@ -64,9 +63,10 @@ def main():
     game.load_board(board, current_player)
 
 
-    print('Below is the current state of the game.')
-    print(f'It is {"Red" if current_player == "R" else "Yellow"} player\'s turn')
-    game.display_board()
+    if (args.print_output=='Verbose' or args.print_output=='Brief'):
+        print('Below is the current state of the game.')
+        print(f'It is {"Red" if current_player == "R" else "Yellow"} player\'s turn')
+        game.display_board()
 
 
     # compute the next move based on the algorithm; print if option entered
