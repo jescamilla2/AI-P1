@@ -26,7 +26,7 @@ where
 
 ## Part 2:
 
-The `tournamnet.py` file is a self-contained executable. Simple run the main method to see the tournament results
+The `tournament.py` file is a self-contained executable. Simply run the main method to see the tournament results
 Adjustments can be made to the algorithms' specifications.
 
 ## Part 3:
