@@ -4,8 +4,9 @@
 The game of Connect Four is played on a grid with 7 columns and 6 rows, and the basic goal of each player
 is to get four of their game pieces in a horizontal, vertical, or diagonal line. Please
 see https://en.wikipedia.org/wiki/Connect_Four for more details on the rules and
-gameplay. In the first part you will develop and test algorithms for making move
-selections given a specific board state. PMCGS and UR are used as a baseline, but ultimately, the UCT algorithm is the focus. Variations of it are tested against one another.
+gameplay. The first part includes implemenation of PCMGS, UR, UCT (and its variations). PMCGS and UR are used only as a baseline, and the UCT algorithm is the focus.
+
+The purpose is to test variations of the UCT algorithm and observe the results.
 
 ## Part 1:
 
