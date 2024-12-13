@@ -21,16 +21,28 @@ class Tree:
         self.root = Node(root_state, player=prior_player)  # Root node of the tree
         self.current_node = self.root # keeps track of tree traversal
 
-    def select(self, algorithm_type='PMCGS', print_out='None'):
+    def select(self, algorithm_type='PMCGS', variation='None', print_out='None'):
         """Select a node to expand based on the given algorithm."""
         current_node = self.root
 
         while not current_node.is_terminal:
             if not current_node.is_fully_expanded():
                 break
-            if algorithm_type == 'UCT':
-                current_node = self._ucb_select(current_node)
 
+            # select the proper UCT variation
+            if algorithm_type == 'UCT':
+                if variation == 'None':
+                    current_node = self._ucb_select(current_node)
+                elif variation == 'Exploitation':
+                    current_node = self._ucb_select(current_node, c=0)
+                elif variation == 'Exploration':
+                    current_node = self._ucb_select(current_node, c=2.5)
+                elif variation == 'Heuristic':
+                    current_node = self._ucb_select_heuristic(current_node)
+                else:
+                    print('No variation selected.')
+
+                # output the necessary messages to the screen
                 if (print_out=='Verbose'):
                     print(f'wi: {current_node.wins}; ni: {current_node.visits}; Move selected: {current_node.move}')
 
@@ -75,7 +87,7 @@ class Tree:
 
         def center_control_heuristic(move):
             """Heuristic to evaluate center control."""
-            center_columns = [3, 4]  # Center columns in a 0-indexed board
+            center_columns = [2, 3, 4]  # Center columns in a 0-indexed board
             return 1 if move in center_columns else 0  # Higher score for center moves
 
         # Select the best child using UCB1 formula adjusted by the center control heuristic

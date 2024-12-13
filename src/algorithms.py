@@ -70,7 +70,7 @@ def pmcgs_move(game, num_simulations, print_out='None'):
         return best_node.move
 
 
-def uct_move(game, num_simulations, print_out='None'):
+def uct_move(game, num_simulations, variation='None', print_out='None'):
     """
     UCT function to select the best move in a Connect Four game.
 
@@ -88,7 +88,15 @@ def uct_move(game, num_simulations, print_out='None'):
 
     for _ in range(num_simulations):
         # Step 2: Selection phase - Select a node to expand
-        selected_node = tree.select(algorithm_type='UCT', print_out=print_out)
+
+        if variation == 'None':
+            selected_node = tree.select(algorithm_type='UCT', print_out=print_out)
+        elif variation == 'Exploitation':
+            selected_node = tree.select(algorithm_type='UCT', variation='Exploitation', print_out=print_out)
+        elif variation == 'Exploration':
+            selected_node = tree.select(algorithm_type='UCT', variation='Exploration', print_out=print_out)
+        elif variation == 'Heuristic':
+            selected_node = tree.select(algorithm_type='UCT', variation='Heuristic', print_out=print_out)
 
         # If we reach a terminal node, backpropagate the result and continue
         if selected_node.is_terminal:

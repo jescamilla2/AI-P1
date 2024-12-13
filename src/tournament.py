@@ -8,7 +8,7 @@ from node import Node
 from tree import Tree
 
 
-def best_move(game, algorithm=None, simulations=0, print_out='None'):
+def best_move(game, algorithm=None, variation='None', simulations=0, print_out='None'):
     """input is a connect_four game board and the algorithm to use to determine the next best move"""
 
     if algorithm == 'UR':
@@ -20,23 +20,23 @@ def best_move(game, algorithm=None, simulations=0, print_out='None'):
     elif algorithm == 'PMCGS':
         # perform a moved based on Pure Monte Carlo Game Search
         move = pmcgs_move(game, simulations, print_out)
-
     elif algorithm == 'UCT':
         # perform a move based Upper Confidence bound for Trees
-        move = uct_move(game, simulations, print_out)
+        move = uct_move(game, simulations, variation, print_out)
     else:
         print('No algorithm selected. Please select.')
 
     return move
 
 
-
 class Game:
     """models a game between two agents"""
 
-    def __init__(self, agent1_algorithm, agent1_sims, agent2_algorithm, agent2_sims, num_games):
+    def __init__(self, agent1_algorithm, agent1_variation, agent1_sims, agent2_algorithm, agent2_variation, agent2_sims, num_games):
         self.agent1_algorithm = agent1_algorithm
         self.agent2_algorithm = agent2_algorithm
+        self.agent1_variation = agent1_variation
+        self.agent2_variation = agent2_variation
         self.agent1_sims = agent1_sims
         self.agent2_sims = agent2_sims
         self.num_games = num_games
@@ -50,9 +50,9 @@ class Game:
 
         while not game.game_over:
             if game.current_player == 'R':
-                move = best_move(game, algorithm=self.agent1_algorithm, simulations=self.agent1_sims, print_out='None')
+                move = best_move(game, algorithm=self.agent1_algorithm, variation=self.agent1_variation, simulations=self.agent1_sims, print_out='None')
             else:
-                move = best_move(game, algorithm=self.agent2_algorithm, simulations=self.agent2_sims, print_out='None')
+                move = best_move(game, algorithm=self.agent2_algorithm, variation=self.agent2_variation, simulations=self.agent2_sims, print_out='None')
 
             if move is not None:
                 game.make_move(move)  # Apply the selected move
@@ -81,17 +81,20 @@ class Tournament:
     def run(self):
         """runs the tournament"""
 
-        # roster = [('UR', 0), ('PMCGS', 500), ('PMCGS', 10000), ('UCT', 500), ('UCT', 10000)]
+        # roster = [('UCT', 'None', 100), ('UCT', 'Exploitation', 100), ('UCT', 'Exploration', 100), ('UCT', 'Heuristic', 100)]
 
         for i in range(len(self.roster) - 1):
             for j in range(i+1, len(self.roster)):
                 agent1_algorithm = self.roster[i][0]
                 agent2_algorithm = self.roster[j][0]
 
-                agent1_sims = self.roster[i][1]
-                agent2_sims = self.roster[j][1]
+                agent1_variation = self.roster[i][1]
+                agent2_variation = self.roster[j][1]
 
-                match = Game(agent1_algorithm, agent1_sims, agent2_algorithm, agent2_sims, self.matches)
+                agent1_sims = self.roster[i][2]
+                agent2_sims = self.roster[j][2]
+
+                match = Game(agent1_algorithm, agent1_variation, agent1_sims, agent2_algorithm, agent2_variation, agent2_sims, self.matches)
                 for _ in range(match.num_games):
                     match.play()
 
@@ -115,7 +118,7 @@ class Tournament:
 
 if __name__ == '__main__':
 
-    agents = [('UR', 0), ('PMCGS', 10), ('PMCGS', 100), ('UCT', 10), ('UCT', 100)]
+    agents = [('UCT', 'None', 100), ('UCT', 'Exploitation', 100), ('UCT', 'Exploration', 100), ('UCT', 'Heuristic', 100)]
 
     tournament = Tournament(agents, 20)
     tournament.run()
